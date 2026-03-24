@@ -1528,6 +1528,188 @@
   if (ageVerified) {
     triggerHeroEntrance();
   }
+
+  // === AMBIENT PARTICLES ===
+  if (!prefersReducedMotion) {
+    const ambientCanvas = document.getElementById('ambient-particles');
+    const actx = ambientCanvas.getContext('2d');
+    let ambientParticles = [];
+
+    function resizeAmbientCanvas() {
+      ambientCanvas.width = window.innerWidth;
+      ambientCanvas.height = window.innerHeight;
+    }
+    resizeAmbientCanvas();
+    window.addEventListener('resize', resizeAmbientCanvas);
+
+    // Create 100 particles
+    for (let i = 0; i < 100; i++) {
+      ambientParticles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: Math.random() * 1.5 + 0.5,
+        opacity: Math.random() * 0.2 + 0.1,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3
+      });
+    }
+
+    function drawAmbientParticles() {
+      actx.clearRect(0, 0, ambientCanvas.width, ambientCanvas.height);
+      // Subtle scroll parallax
+      const scrollOffset = window.scrollY * 0.05;
+      ambientParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        // Wrap around edges
+        if (p.x < 0) p.x = ambientCanvas.width;
+        if (p.x > ambientCanvas.width) p.x = 0;
+        if (p.y < 0) p.y = ambientCanvas.height;
+        if (p.y > ambientCanvas.height) p.y = 0;
+
+        actx.beginPath();
+        actx.arc(p.x, p.y - scrollOffset % ambientCanvas.height, p.radius, 0, Math.PI * 2);
+        actx.fillStyle = `rgba(255,255,255,${p.opacity})`;
+        actx.fill();
+      });
+    }
+  }
+
+  // === BUBBLE PARTICLES ===
+  if (!prefersReducedMotion) {
+    const bubbleCanvas = document.getElementById('bubble-particles');
+    const bctx = bubbleCanvas.getContext('2d');
+    let bubbles = [];
+    let bubblesActive = false;
+
+    function resizeBubbleCanvas() {
+      bubbleCanvas.width = bubbleCanvas.parentElement.offsetWidth;
+      bubbleCanvas.height = bubbleCanvas.parentElement.offsetHeight;
+    }
+    resizeBubbleCanvas();
+    window.addEventListener('resize', resizeBubbleCanvas);
+
+    // Create 70 bubble particles
+    function resetBubble(b) {
+      const canRect = canImage.getBoundingClientRect();
+      const heroRect = heroSection.getBoundingClientRect();
+      b.x = canRect.left - heroRect.left + canRect.width * (0.3 + Math.random() * 0.4);
+      b.y = canRect.top - heroRect.top;
+      b.radius = Math.random() * 2 + 1;
+      b.opacity = Math.random() * 0.5 + 0.3;
+      b.speed = Math.random() * 1.5 + 0.5;
+      b.drift = Math.random() * Math.PI * 2; // sine wave phase
+      b.driftSpeed = Math.random() * 0.02 + 0.01;
+      b.driftAmp = Math.random() * 12 + 5;
+    }
+
+    for (let i = 0; i < 70; i++) {
+      const b = {};
+      resetBubble(b);
+      b.y = Math.random() * bubbleCanvas.height; // random start position
+      bubbles.push(b);
+    }
+
+    // Activate bubbles on scroll — aligned threshold with bottle_interaction
+    ScrollTrigger.create({
+      trigger: '.hero',
+      start: '50px top',
+      onEnter: () => { bubblesActive = true; },
+      onLeaveBack: () => { bubblesActive = false; }
+    });
+
+    function drawBubbles() {
+      bctx.clearRect(0, 0, bubbleCanvas.width, bubbleCanvas.height);
+      if (!bubblesActive) return;
+      bubbles.forEach(b => {
+        b.y -= b.speed;
+        b.drift += b.driftSpeed;
+        const driftX = Math.sin(b.drift) * b.driftAmp;
+        // Fade out near top
+        const fadeZone = bubbleCanvas.height * 0.2;
+        const alpha = b.y < fadeZone ? (b.y / fadeZone) * b.opacity : b.opacity;
+        if (b.y < -10) resetBubble(b);
+
+        bctx.beginPath();
+        bctx.arc(b.x + driftX, b.y, b.radius, 0, Math.PI * 2);
+        bctx.fillStyle = `rgba(255,255,255,${Math.max(0, alpha)})`;
+        bctx.fill();
+      });
+    }
+  }
+
+  // === UNIFIED RENDER LOOP ===
+  function animationLoop() {
+    if (!document.hidden && !prefersReducedMotion) {
+      drawAmbientParticles();
+      drawBubbles();
+    }
+    requestAnimationFrame(animationLoop);
+  }
+  if (!prefersReducedMotion) {
+    requestAnimationFrame(animationLoop);
+  }
+
+  // === MAGNETIC BUTTONS ===
+  // Only .cta-btn and .submit-btn get the magnetic effect.
+  // Age gate buttons (.btn-yes, .btn-no) are removed from DOM on dismiss,
+  // so they are excluded here.
+  if (isDesktop && !prefersReducedMotion) {
+    document.querySelectorAll('.cta-btn, .submit-btn').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distX = e.clientX - centerX;
+        const distY = e.clientY - centerY;
+        const dist = Math.sqrt(distX * distX + distY * distY);
+        const maxDist = 100;
+
+        if (dist < maxDist) {
+          const pull = (1 - dist / maxDist) * 12;
+          const angle = Math.atan2(distY, distX);
+          gsap.to(btn, {
+            x: Math.cos(angle) * pull,
+            y: Math.sin(angle) * pull,
+            duration: 0.3, ease: 'power2.out'
+          });
+        }
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        gsap.to(btn, {
+          x: 0, y: 0,
+          duration: 0.4, ease: 'elastic.out(1, 0.5)'
+        });
+      });
+    });
+  }
+
+  // === RIPPLE CLICK ===
+  document.querySelectorAll('.cta-btn, .submit-btn').forEach(btn => {
+    btn.style.position = 'relative';
+    btn.style.overflow = 'hidden';
+
+    btn.addEventListener('click', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height) * 2;
+      ripple.style.cssText = `
+        position: absolute; border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        width: ${size}px; height: ${size}px;
+        left: ${e.clientX - rect.left - size/2}px;
+        top: ${e.clientY - rect.top - size/2}px;
+        transform: scale(0); pointer-events: none;
+      `;
+      btn.appendChild(ripple);
+      gsap.to(ripple, {
+        scale: 4, opacity: 0, duration: 0.6,
+        ease: 'power2.out',
+        onComplete: () => ripple.remove()
+      });
+    });
+  });
   </script>
 
 </body>
