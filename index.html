@@ -1926,6 +1926,143 @@
     emailInput.classList.remove('error');
     errorMsg.style.display = 'none';
   });
+
+  // === SOUND TOGGLE ===
+  const soundToggle = document.querySelector('.sound-toggle');
+  let audioCtx, isPlaying = false;
+
+  function createAmbientAudio() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Low drone
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 80;
+
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0.03; // Very quiet
+
+    // Filtered noise for texture
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 200;
+
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.value = 0.01;
+
+    osc.connect(gain).connect(audioCtx.destination);
+    noise.connect(noiseFilter).connect(noiseGain).connect(audioCtx.destination);
+    osc.start();
+    noise.start();
+
+    return { osc, noise, gain, noiseGain };
+  }
+
+  let audioNodes;
+  soundToggle.addEventListener('click', () => {
+    if (!audioCtx) audioNodes = createAmbientAudio();
+
+    if (isPlaying) {
+      audioCtx.suspend();
+      isPlaying = false;
+      soundToggle.classList.remove('active');
+      sessionStorage.setItem('soundEnabled', 'false');
+    } else {
+      audioCtx.resume();
+      isPlaying = true;
+      soundToggle.classList.add('active');
+      sessionStorage.setItem('soundEnabled', 'true');
+      // ANALYTICS: sound enabled
+      trackEvent('sound_enabled');
+    }
+  });
+
+  // Restore sound state
+  if (sessionStorage.getItem('soundEnabled') === 'true') {
+    // Don't autoplay — browsers block it. Show visual hint that sound was on.
+    soundToggle.classList.add('was-active');
+  }
+
+  // === ANALYTICS — SCROLL DEPTH ===
+  const scrollThresholds = { 25: false, 50: false, 75: false, 100: false };
+  let scrollTicking = false;
+  window.addEventListener('scroll', () => {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      const scrollHeight = document.body.scrollHeight - window.innerHeight;
+      if (scrollHeight > 0) {
+        const pct = (window.scrollY / scrollHeight) * 100;
+        [25, 50, 75, 100].forEach(threshold => {
+          if (pct >= threshold && !scrollThresholds[threshold]) {
+            scrollThresholds[threshold] = true;
+            trackEvent(`scroll_${threshold}`);
+          }
+        });
+      }
+      scrollTicking = false;
+    });
+  });
+
+  // === ANALYTICS — PRIZE SECTION VIEWED ===
+  ScrollTrigger.create({
+    trigger: '.prize-reveal',
+    start: 'top 80%',
+    once: true,
+    onEnter: () => trackEvent('prize_section_viewed')
+  });
+
+  // === ANALYTICS — CTA CLICKS ===
+  document.querySelectorAll('.hero .cta-btn').forEach(btn =>
+    btn.addEventListener('click', () => trackEvent('cta_hero_clicked'))
+  );
+  document.querySelectorAll('.prize-reveal .cta-btn').forEach(btn =>
+    btn.addEventListener('click', () => trackEvent('cta_prize_clicked'))
+  );
+
+  // === ANALYTICS — FORM ABANDONED ===
+  window.addEventListener('beforeunload', () => {
+    if (formFocused && !formSubmitted) trackEvent('form_abandoned');
+  });
+
+  // === ANALYTICS — BOTTLE INTERACTION ===
+  // Aligned with bubble activation threshold (50px)
+  ScrollTrigger.create({
+    trigger: '.hero',
+    start: '50px top',
+    once: true,
+    onEnter: () => trackEvent('bottle_interaction')
+  });
+
+  // === ANALYTICS — TIME ON PAGE ===
+  setTimeout(() => trackEvent('time_on_page_30s'), 30000);
+  setTimeout(() => trackEvent('time_on_page_60s'), 60000);
+  setTimeout(() => trackEvent('time_on_page_120s'), 120000);
+
+  // === CTA SCROLL TO FORM ===
+  document.querySelectorAll('.cta-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const formSection = document.querySelector('.entry-form');
+      if (lenis) {
+        lenis.scrollTo(formSection, { offset: -50 });
+      } else {
+        formSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // End of inline script
   </script>
 
 </body>
