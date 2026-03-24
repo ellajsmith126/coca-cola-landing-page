@@ -1227,8 +1227,307 @@
 
   <!-- Inline JS begins in Task 4 -->
   <script>
-  // All JS from Tasks 4–16 goes inside this single script block.
-  // Each task appends to this block sequentially.
+  // ============================================================
+  // TASK 4: Config, Analytics, Lenis + GSAP ScrollTrigger
+  // ============================================================
+
+  // === CONFIGURATION ===
+  const FORM_ENDPOINT = 'YOUR_FORM_ENDPOINT_HERE';
+  const GA_MEASUREMENT_ID = 'YOUR_GA4_ID_HERE';
+  const COMPETITION_NAME = 'One in a Million';
+  const ELIGIBLE_TERRITORIES = '[eligible territories]';
+  const DRAW_FREQUENCY = 'monthly';
+  const CAN_IMAGE_PATH = './assets/Drinks-cola.webp';
+
+  // === GA4 CONFIG (activate with real measurement ID) ===
+  if (GA_MEASUREMENT_ID !== 'YOUR_GA4_ID_HERE') {
+    gtag('config', GA_MEASUREMENT_ID);
+  }
+
+  // === REDUCED MOTION CHECK ===
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isDesktop = window.matchMedia('(hover: hover)').matches;
+
+  // === ANALYTICS HELPER ===
+  // Defined early so all tasks can call trackEvent() inline.
+  // Pushes to dataLayer (for GTM) and fires gtag (for GA4).
+  window.dataLayer = window.dataLayer || [];
+
+  function trackEvent(eventName, params = {}) {
+    const data = { event: eventName, ...params };
+    dataLayer.push(data);
+    if (typeof gtag !== 'undefined') {
+      gtag('event', eventName, params);
+    }
+  }
+
+  // === SMOOTH SCROLL ===
+  let lenis;
+  if (!prefersReducedMotion) {
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  } else {
+    // Register ScrollTrigger without Lenis — native scroll
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ============================================================
+  // TASK 5: Age Gate with Cinematic Dismiss
+  // ============================================================
+
+  // === HERO ENTRANCE PLACEHOLDER ===
+  // This function is defined as a no-op here. Task 7 (hero) overwrites it
+  // with the full character-split + entrance animation sequence.
+  // Age gate calls triggerHeroEntrance() on dismiss, so it must exist first.
+  function triggerHeroEntrance() {}
+
+  // === AGE GATE ===
+  const ageGate = document.getElementById('age-gate');
+  const ageVerified = sessionStorage.getItem('ageVerified') === 'true';
+
+  function dismissAgeGate(accepted) {
+    const card = ageGate.querySelector('.age-gate-card');
+    const tl = gsap.timeline({
+      onComplete: () => {
+        ageGate.remove();
+        if (accepted) {
+          sessionStorage.setItem('ageVerified', 'true');
+          // ANALYTICS: age gate passed
+          trackEvent('age_gate_passed');
+          triggerHeroEntrance(); // defined fully in Task 7
+        } else {
+          // ANALYTICS: age gate failed
+          trackEvent('age_gate_failed');
+          window.location.href = 'about:blank';
+        }
+      }
+    });
+
+    if (prefersReducedMotion) {
+      ageGate.remove();
+      if (accepted) {
+        sessionStorage.setItem('ageVerified', 'true');
+        trackEvent('age_gate_passed');
+        triggerHeroEntrance();
+      } else {
+        trackEvent('age_gate_failed');
+        window.location.href = 'about:blank';
+      }
+      return;
+    }
+
+    // Button press feedback
+    tl.to(accepted ? '.btn-yes' : '.btn-no', { scale: 1.05, duration: 0.1 });
+    // Card fades and scales down
+    tl.to(card, { opacity: 0, scale: 0.9, duration: 0.4, ease: 'power2.inOut' });
+    // Backdrop fades
+    tl.to(ageGate, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, '-=0.2');
+  }
+
+  if (ageVerified) {
+    ageGate.remove();
+    // triggerHeroEntrance() called after hero animations are defined (Task 7)
+  } else {
+    document.querySelector('.btn-yes').addEventListener('click', () => dismissAgeGate(true));
+    document.querySelector('.btn-no').addEventListener('click', () => dismissAgeGate(false));
+    // Focus trap: Tab cycles between the two buttons
+    const buttons = ageGate.querySelectorAll('button');
+    ageGate.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        const focused = document.activeElement;
+        if (e.shiftKey && focused === buttons[0]) { e.preventDefault(); buttons[1].focus(); }
+        else if (!e.shiftKey && focused === buttons[1]) { e.preventDefault(); buttons[0].focus(); }
+      }
+    });
+    buttons[0].focus();
+  }
+
+  // ============================================================
+  // TASK 6: Custom Cursor
+  // ============================================================
+
+  // === CUSTOM CURSOR ===
+  if (isDesktop && !prefersReducedMotion) {
+    const cursorDot = document.querySelector('.cursor-dot');
+    const cursorRing = document.querySelector('.cursor-ring');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      gsap.set(cursorDot, { x: mouseX, y: mouseY });
+    });
+
+    // Ring follows with lerp
+    gsap.ticker.add(() => {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      gsap.set(cursorRing, { x: ringX, y: ringY });
+    });
+
+    // Hover states for interactive elements
+    const interactives = document.querySelectorAll('button, a, .sound-toggle');
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursorRing.classList.add('cursor-hover');
+        if (el.classList.contains('cta-btn') || el.classList.contains('submit-btn')) {
+          cursorRing.classList.add('cursor-cta');
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        cursorRing.classList.remove('cursor-hover', 'cursor-cta');
+      });
+    });
+
+    // Show cursors
+    document.addEventListener('mouseenter', () => {
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+    });
+    document.addEventListener('mouseleave', () => {
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    });
+  } else {
+    // Remove cursor elements on touch devices
+    document.querySelector('.cursor-dot')?.remove();
+    document.querySelector('.cursor-ring')?.remove();
+  }
+
+  // ============================================================
+  // TASK 7: Hero — Character Split, Entrance, Mouse-Follow, Scroll
+  // ============================================================
+
+  // === CHARACTER SPLIT ===
+  function splitTextToChars(element) {
+    const text = element.textContent;
+    element.innerHTML = '';
+    text.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      span.style.display = 'inline-block';
+      element.appendChild(span);
+    });
+    return element.querySelectorAll('span');
+  }
+
+  const heroH1 = document.querySelector('.hero h1');
+  const chars = splitTextToChars(heroH1);
+
+  // === HERO ENTRANCE ANIMATION ===
+  // Overwrites the placeholder from Task 5.
+  triggerHeroEntrance = function() {
+    if (prefersReducedMotion) {
+      gsap.set(chars, { opacity: 1, y: 0, rotateX: 0 });
+      gsap.set('.hero .subheadline', { opacity: 1, y: 0 });
+      gsap.set('.hero .cta-btn', { opacity: 1, y: 0 });
+      gsap.set('.hero .micro-text', { opacity: 1 });
+      gsap.set('.scroll-prompt', { opacity: 0.4 });
+      return;
+    }
+
+    const tl = gsap.timeline();
+    // Characters animate in
+    tl.from(chars, {
+      opacity: 0, y: 60, rotateX: -90,
+      duration: 1.2, stagger: 0.03, ease: 'power4.out'
+    });
+    // Subheadline fades up
+    tl.from('.hero .subheadline', {
+      opacity: 0, y: 30, duration: 0.8, ease: 'power3.out'
+    }, '-=0.6');
+    // CTA fades up
+    tl.from('.hero .cta-btn', {
+      opacity: 0, y: 20, duration: 0.6, ease: 'power3.out'
+    }, '-=0.4');
+    // Micro text
+    tl.from('.hero .micro-text', {
+      opacity: 0, duration: 0.4
+    }, '-=0.2');
+    // Scroll prompt appears
+    tl.from('.scroll-prompt', {
+      opacity: 0, duration: 0.6
+    }, '-=0.2');
+    // Shimmer sweep after text settles
+    tl.add(() => {
+      heroH1.classList.add('shimmer-active');
+      // Repeat shimmer every 8 seconds
+      setInterval(() => {
+        heroH1.classList.remove('shimmer-active');
+        void heroH1.offsetWidth; // force reflow to restart animation
+        heroH1.classList.add('shimmer-active');
+      }, 8000);
+    }, '+=0.3');
+  };
+
+  // === MOUSE-FOLLOW CAN ===
+  // Mouse-follow applies to .can-image (the img) to avoid conflicting
+  // with GSAP ScrollTrigger transforms on .can-wrapper (the outer div).
+  const heroSection = document.querySelector('.hero');
+  const canImage = document.querySelector('.can-image');
+  let canTargetRotateX = 0, canTargetRotateY = 0;
+  let canCurrentRotateX = 0, canCurrentRotateY = 0;
+
+  if (isDesktop && !prefersReducedMotion) {
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const mouseXRel = e.clientX - rect.left - centerX;
+      const mouseYRel = e.clientY - rect.top - centerY;
+      canTargetRotateY = (mouseXRel / centerX) * 8;  // max 8deg
+      canTargetRotateX = -(mouseYRel / centerY) * 8;
+    });
+
+    heroSection.addEventListener('mouseleave', () => {
+      canTargetRotateX = 0;
+      canTargetRotateY = 0;
+    });
+
+    gsap.ticker.add(() => {
+      canCurrentRotateX += (canTargetRotateX - canCurrentRotateX) * 0.08;
+      canCurrentRotateY += (canTargetRotateY - canCurrentRotateY) * 0.08;
+      // Only mouse-follow tilt on .can-image; scroll transforms are on .can-wrapper
+      canImage.style.transform = `perspective(1000px) rotateX(${canCurrentRotateX}deg) rotateY(${canCurrentRotateY}deg)`;
+    });
+  }
+
+  // === SCROLL-DRIVEN CAN ===
+  // GSAP animates .can-wrapper (outer div) so transforms don't conflict
+  // with the mouse-follow tilt on .can-image (inner img).
+  if (!prefersReducedMotion) {
+    gsap.to('.can-wrapper', {
+      y: -150,
+      scale: 1.1,
+      rotate: -5,
+      '--glow-intensity': 160, // intensifies drop-shadow on scroll
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      }
+    });
+
+    // Scroll prompt fades out
+    gsap.to('.scroll-prompt', {
+      opacity: 0,
+      scrollTrigger: {
+        trigger: '.hero',
+        start: '50px top',
+        end: '150px top',
+        scrub: true
+      }
+    });
+  }
+
+  // Trigger hero entrance if age gate was already dismissed
+  if (ageVerified) {
+    triggerHeroEntrance();
+  }
   </script>
 
 </body>
