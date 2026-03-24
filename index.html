@@ -61,6 +61,8 @@
 
   html {
     scroll-behavior: auto; /* Lenis handles smooth scroll */
+    width: 100%;
+    min-width: 320px;
   }
 
   body {
@@ -71,8 +73,16 @@
     color: var(--color-text-primary);
     background-color: var(--color-bg-primary);
     overflow-x: hidden;
+    width: 100%;
+    min-width: 320px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent Lenis stopped state from clipping layout */
+  html.lenis.lenis-stopped {
+    overflow-x: clip;
+    overflow-y: scroll;
   }
 
   @media (min-width: 768px) {
@@ -271,6 +281,7 @@
   .hero {
     position: relative;
     min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
