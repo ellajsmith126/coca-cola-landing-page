@@ -116,16 +116,12 @@
      TYPOGRAPHY
      ============================================ */
   h1 {
-    font-size: 32px;
+    font-size: clamp(28px, 4.2vw, 68px);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.1;
-  }
-
-  @media (min-width: 768px) {
-    h1 {
-      font-size: 72px;
-    }
+    overflow-wrap: normal;
+    word-break: keep-all;
   }
 
   h2 {
@@ -1554,13 +1550,28 @@
   function splitTextToChars(element) {
     const text = element.textContent;
     element.innerHTML = '';
-    text.split('').forEach(char => {
-      const span = document.createElement('span');
-      span.textContent = char === ' ' ? '\u00A0' : char;
-      span.style.display = 'inline-block';
-      element.appendChild(span);
+    const words = text.split(' ');
+    words.forEach((word, wi) => {
+      const wordWrap = document.createElement('span');
+      wordWrap.style.whiteSpace = 'nowrap';
+      wordWrap.style.display = 'inline';
+      word.split('').forEach(char => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block';
+        span.classList.add('char');
+        wordWrap.appendChild(span);
+      });
+      element.appendChild(wordWrap);
+      if (wi < words.length - 1) {
+        const space = document.createElement('span');
+        space.textContent = '\u00A0';
+        space.style.display = 'inline-block';
+        space.classList.add('char');
+        element.appendChild(space);
+      }
     });
-    return element.querySelectorAll('span');
+    return element.querySelectorAll('.char');
   }
 
   const heroH1 = document.querySelector('.hero h1');
