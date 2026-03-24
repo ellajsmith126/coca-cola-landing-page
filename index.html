@@ -1710,6 +1710,222 @@
       });
     });
   });
+
+  // === PRIZE REVEAL ANIMATIONS ===
+  if (!prefersReducedMotion) {
+    // Section label letter-spacing animation
+    gsap.from('.prize-reveal .section-label', {
+      opacity: 0, letterSpacing: '0.3em',
+      duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.prize-reveal', start: 'top 80%' }
+    });
+
+    // H2 clip-reveal
+    gsap.from('.prize-reveal h2', {
+      y: '100%', duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.prize-reveal h2', start: 'top 85%' }
+    });
+
+    // Prize items stagger in
+    gsap.from('.prize-item', {
+      opacity: 0, y: 40, scale: 0.95,
+      duration: 0.7, stagger: 0.15, ease: 'power3.out',
+      scrollTrigger: { trigger: '.prize-list', start: 'top 80%' },
+      onComplete: function() {
+        // Flash accent bars
+        gsap.fromTo('.prize-accent',
+          { opacity: 0.5 }, { opacity: 1, duration: 0.3, stagger: 0.1 }
+        );
+      }
+    });
+
+    // Transition line + CTA
+    gsap.from('.prize-reveal .transition-line', {
+      opacity: 0, y: 20, duration: 0.6,
+      scrollTrigger: { trigger: '.transition-line', start: 'top 85%' }
+    });
+  }
+
+  // === £500 COUNTER ===
+  if (!prefersReducedMotion) {
+    const spendingItem = document.querySelector('[data-counter]');
+    if (spendingItem) {
+      const counterObj = { val: 0 };
+      ScrollTrigger.create({
+        trigger: spendingItem,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(counterObj, {
+            val: 500, duration: 1.5, ease: 'power2.out',
+            onUpdate: () => {
+              spendingItem.querySelector('.counter-value').textContent =
+                Math.round(counterObj.val);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  // === FEELING SECTION PARALLAX ===
+  if (!prefersReducedMotion) {
+    // Bokeh circles parallax (slower scroll rate)
+    gsap.to('.feeling .bokeh-layer', {
+      y: -80,
+      scrollTrigger: {
+        trigger: '.feeling',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+
+    // H2 clip-reveal
+    gsap.from('.feeling h2', {
+      y: '100%', duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.feeling h2', start: 'top 85%' }
+    });
+
+    // Body paragraphs fade in
+    gsap.from('.feeling p', {
+      opacity: 0, y: 30, duration: 0.7, stagger: 0.2, ease: 'power3.out',
+      scrollTrigger: { trigger: '.feeling p', start: 'top 85%' }
+    });
+  }
+
+  // === HOW TO ENTER ===
+  if (!prefersReducedMotion) {
+    gsap.from('.how-to-enter .section-label', {
+      opacity: 0, letterSpacing: '0.3em',
+      duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.how-to-enter', start: 'top 80%' }
+    });
+
+    gsap.from('.how-to-enter h2', {
+      y: '100%', duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.how-to-enter h2', start: 'top 85%' }
+    });
+
+    gsap.from('.step-card', {
+      opacity: 0, y: 60, duration: 0.7, stagger: 0.15, ease: 'power3.out',
+      scrollTrigger: { trigger: '.steps-grid', start: 'top 80%' }
+    });
+  }
+
+  // === ENTRY FORM SPOTLIGHT ===
+  if (!prefersReducedMotion) {
+    const formSection = document.querySelector('.entry-form');
+    gsap.fromTo(formSection,
+      { backgroundImage: 'radial-gradient(ellipse at center, rgba(26,0,0,0) 0%, #0A0A0A 70%)' },
+      {
+        backgroundImage: 'radial-gradient(ellipse at center, #1A0000 0%, #0A0A0A 70%)',
+        duration: 1.2, ease: 'power2.inOut',
+        scrollTrigger: { trigger: formSection, start: 'top 70%', once: true }
+      }
+    );
+
+    // Form elements fade in
+    gsap.from('.entry-form h2', {
+      y: '100%', duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.entry-form h2', start: 'top 85%' }
+    });
+
+    gsap.from('.form-container', {
+      opacity: 0, y: 30, duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.form-container', start: 'top 85%' }
+    });
+  }
+
+  // === FORM HANDLING ===
+  const form = document.getElementById('entry-form');
+  const submitBtn = document.querySelector('.submit-btn');
+  const errorMsg = document.querySelector('.form-error');
+  const confirmationMsg = document.querySelector('.form-confirmation');
+  const formContainer = document.querySelector('.form-container');
+  let formFocused = false, formSubmitted = false;
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // === GRADIENT BORDER ===
+  const inputWrapper = document.querySelector('.input-gradient-wrapper');
+  const emailInput = document.getElementById('email');
+
+  emailInput.addEventListener('focus', () => {
+    inputWrapper.classList.add('active');
+    // ANALYTICS: form field focused (fire once)
+    if (!formFocused) { trackEvent('form_field_focused'); formFocused = true; }
+  });
+  emailInput.addEventListener('blur', () => {
+    inputWrapper.classList.remove('active');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+
+    // Validate
+    if (!isValidEmail(email)) {
+      emailInput.classList.add('error');
+      errorMsg.textContent = 'Please enter a valid email address';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    emailInput.classList.remove('error');
+    errorMsg.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Entering...';
+
+    // Dev mode fallback
+    if (FORM_ENDPOINT === 'YOUR_FORM_ENDPOINT_HERE') {
+      console.log('DEV MODE — Form payload:', { email });
+      showConfirmation();
+      return;
+    }
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (res.ok) {
+        showConfirmation();
+      } else {
+        showFormError('Something went wrong. Please try again.');
+      }
+    } catch {
+      showFormError('Something went wrong. Please try again.');
+    }
+  });
+
+  function showConfirmation() {
+    formContainer.querySelector('form').style.display = 'none';
+    confirmationMsg.style.display = 'block';
+    // ANALYTICS: form submitted + confirmation viewed
+    trackEvent('competition_entry_submitted');
+    formSubmitted = true;
+    trackEvent('entry_confirmation_viewed');
+    if (!prefersReducedMotion) {
+      gsap.from(confirmationMsg, { opacity: 0, scale: 0.9, duration: 0.5, ease: 'back.out(1.5)' });
+    }
+  }
+
+  function showFormError(msg) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enter the Draw \u2192';
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+
+  // Clear error on input
+  emailInput.addEventListener('input', () => {
+    emailInput.classList.remove('error');
+    errorMsg.style.display = 'none';
+  });
   </script>
 
 </body>
