@@ -17,7 +17,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.css">
   <link rel="preload" as="image" href="./assets/Drinks-cola.webp">
 
@@ -279,76 +279,104 @@
     min-height: 100vh;
     width: 100%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 64px 24px;
+    padding: 0;
     overflow: hidden;
+    background: var(--color-bg-primary);
+  }
+
+  /* --- Photo grid background --- */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px;
+    opacity: 0.55;
   }
 
   @media (min-width: 768px) {
-    .hero {
-      padding: 100px 24px;
+    .hero-grid {
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 10px;
+      padding: 10px;
     }
   }
 
-  .hero h1 {
+  .hero-grid-item {
+    overflow: hidden;
+    border-radius: 6px;
+    position: relative;
+  }
+
+  .hero-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .hero-grid-item:hover img {
+    transform: scale(1.05);
+  }
+
+  /* --- Hero overlay content --- */
+  .hero-overlay {
     position: relative;
     z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 24px;
   }
 
-  .hero h1 span {
-    display: inline-block;
+  .hero-script {
+    font-family: var(--font-family);
+    font-size: clamp(28px, 4.2vw, 68px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+    text-shadow: 0 4px 40px rgba(0,0,0,0.7);
+    margin-bottom: 2rem;
   }
 
-  .hero-eyebrow {
-    color: var(--color-accent);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-    opacity: 0.9;
-    position: relative;
-    z-index: 3;
+  .hero-enter-btn {
+    margin-bottom: 2.5rem;
   }
 
-  .hero .subheadline {
+  /* --- Hero CTA section below grid --- */
+  .hero-cta {
+    padding: 80px 24px;
+    text-align: center;
+    background: var(--color-bg-primary);
+  }
+
+  .hero-cta h1 {
+    margin-bottom: 16px;
+  }
+
+  .hero-cta .subheadline {
     font-size: 18px;
     color: var(--color-text-secondary);
-    margin-top: 24px;
-    max-width: 480px;
-    position: relative;
-    z-index: 3;
+    margin: 0 auto 32px;
+    max-width: 520px;
   }
 
   @media (min-width: 768px) {
-    .hero .subheadline {
+    .hero-cta .subheadline {
       font-size: 20px;
     }
-  }
-
-  /* --- Can wrapper & image --- */
-  /* .can-wrapper: GSAP ScrollTrigger animates this (y, scale, rotate, --glow-intensity) */
-  /* .can-image (img inside): mouse-follow tilt applied via style.transform */
-  .can-wrapper {
-    position: relative;
-    z-index: 2;
-    margin-bottom: 32px;
-    filter: drop-shadow(0 0 calc(var(--glow-intensity, 80) * 1px) rgba(232,0,45,0.4));
-    will-change: transform, filter;
-  }
-
-  .can-image {
-    width: 200px;
-    height: auto;
-    will-change: transform;
-  }
-
-  @media (min-width: 768px) {
-    .can-image {
-      width: 300px;
+    .hero-cta {
+      padding: 100px 24px;
     }
   }
 
@@ -561,22 +589,37 @@
   .feeling {
     position: relative;
     overflow: hidden;
-    padding: 64px 24px;
-    background: linear-gradient(180deg, #1a0a00 0%, #0a0505 100%);
+    padding: 120px 24px;
+    background: #000;
     text-align: center;
   }
 
   @media (min-width: 768px) {
     .feeling {
-      padding: 100px 24px;
+      padding: 160px 24px;
     }
+  }
+
+  .feeling-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .feeling-video-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.55);
   }
 
   .feeling h2 {
     position: relative;
     z-index: 3;
-    text-shadow: 0 0 40px rgba(232,0,45,0.2), 0 0 80px rgba(232,0,45,0.1);
-    animation: text-glow-pulse 4s ease-in-out infinite;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.7);
     margin-bottom: 32px;
   }
 
@@ -588,64 +631,7 @@
     color: var(--color-text-secondary);
     font-size: 18px;
     line-height: 1.7;
-  }
-
-  /* Bokeh layer */
-  .bokeh-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .bokeh-circle {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(30px);
-  }
-
-  /* 10 bokeh circles with individual positions/sizes/colors */
-  .bokeh-circle:nth-child(1)  { width: 100px; height: 100px; top: 10%; left: 5%;  background: rgba(232,150,50,0.2); }
-  .bokeh-circle:nth-child(2)  { width: 60px;  height: 60px;  top: 20%; left: 80%; background: rgba(232,180,80,0.15); }
-  .bokeh-circle:nth-child(3)  { width: 120px; height: 120px; top: 50%; left: 15%; background: rgba(200,120,40,0.18); }
-  .bokeh-circle:nth-child(4)  { width: 80px;  height: 80px;  top: 70%; left: 70%; background: rgba(232,160,60,0.2); }
-  .bokeh-circle:nth-child(5)  { width: 40px;  height: 40px;  top: 30%; left: 50%; background: rgba(255,200,100,0.15); }
-  .bokeh-circle:nth-child(6)  { width: 90px;  height: 90px;  top: 60%; left: 40%; background: rgba(232,140,50,0.22); }
-  .bokeh-circle:nth-child(7)  { width: 50px;  height: 50px;  top: 15%; left: 35%; background: rgba(255,180,70,0.12); }
-  .bokeh-circle:nth-child(8)  { width: 110px; height: 110px; top: 80%; left: 20%; background: rgba(200,100,30,0.2); }
-  .bokeh-circle:nth-child(9)  { width: 70px;  height: 70px;  top: 40%; left: 90%; background: rgba(232,170,60,0.17); }
-  .bokeh-circle:nth-child(10) { width: 30px;  height: 30px;  top: 85%; left: 60%; background: rgba(255,210,120,0.15); }
-
-  /* Light streaks */
-  .light-streak {
-    position: absolute;
-    z-index: 2;
-    width: 2px;
-    height: 200%;
-    opacity: 0.06;
-    pointer-events: none;
-    animation: light-streak 15s linear infinite;
-  }
-
-  .light-streak:nth-child(1) {
-    left: 20%;
-    background: linear-gradient(180deg, transparent, rgba(232,0,45,0.3), transparent);
-    transform: rotate(15deg);
-    animation-delay: 0s;
-  }
-
-  .light-streak:nth-child(2) {
-    left: 50%;
-    background: linear-gradient(180deg, transparent, rgba(255,200,100,0.2), transparent);
-    transform: rotate(-10deg);
-    animation-delay: -5s;
-  }
-
-  .light-streak:nth-child(3) {
-    left: 75%;
-    background: linear-gradient(180deg, transparent, rgba(232,0,45,0.2), transparent);
-    transform: rotate(20deg);
-    animation-delay: -10s;
+    text-shadow: 0 1px 20px rgba(0,0,0,0.6);
   }
 
   /* ============================================
@@ -1083,9 +1069,9 @@
     }
   }
 
-  /* Mobile: can float animation (no mouse-follow on touch) */
+  /* Mobile: grid subtle pulse (no mouse-follow on touch) */
   @media (hover: none) {
-    .can-wrapper {
+    .hero-grid {
       animation: float 3s ease-in-out infinite;
     }
   }
@@ -1105,9 +1091,8 @@
       animation: none;
     }
 
-    .can-wrapper {
+    .hero-grid {
       animation: none;
-      filter: drop-shadow(0 0 80px rgba(232,0,45,0.4));
     }
 
     #ambient-particles,
@@ -1153,27 +1138,48 @@
       </svg>
     </button>
 
-    <div class="can-wrapper">
-      <img class="can-image" src="./assets/Drinks-cola.webp" alt="Coca-Cola Classic can" />
+    <!-- Photo grid background -->
+    <div class="hero-grid" aria-hidden="true">
+      <div class="hero-grid-item"><img src="./assets/Man-drinking-Coke-008.avif" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-coca-cola-can-lot-water-drops-226521323.webp" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/istockphoto-487787108-612x612.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-photo-pouring-cola-drink-glass-ice-cubes-magnified-view-captures-refreshing-process-serving-cola-418292359.webp" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/images.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/images (1).jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/wp14748701.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/images (2).jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/Drinks-cola.webp" alt="" loading="eager"></div>
+      <!-- Repeat images to fill 5-column desktop grid -->
+      <div class="hero-grid-item"><img src="./assets/Man-drinking-Coke-008.avif" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-coca-cola-can-lot-water-drops-226521323.webp" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/istockphoto-487787108-612x612.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-photo-pouring-cola-drink-glass-ice-cubes-magnified-view-captures-refreshing-process-serving-cola-418292359.webp" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/images.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/images (1).jpg" alt="" loading="eager"></div>
     </div>
 
-    <p class="hero-eyebrow">One in a Million.</p>
-    <div class="reveal-wrapper">
-      <h1>Win the Ultimate Festival VIP Experience.</h1>
+    <!-- Overlay content -->
+    <div class="hero-overlay">
+      <h1 class="hero-script">One in a Million</h1>
+      <button class="cta-btn hero-enter-btn" type="button" aria-label="Enter Here">Enter Here</button>
+      <div class="scroll-prompt" aria-hidden="true">
+        <span>Scroll</span>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
     </div>
+  </section>
 
-    <!-- TODO: Replace "Wireless Festival" with actual festival name before launch -->
-    <p class="subheadline">Enter for your chance to win the full Wireless Festival VIP experience. It takes 10 seconds.</p>
-
-    <button class="cta-btn" type="button" aria-label="Enter Now">Enter Now</button>
-
-    <p class="micro-text">Free to enter. No purchase necessary.</p>
-
-    <div class="scroll-prompt" aria-hidden="true">
-      <span>Scroll</span>
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
+  <!-- ========== HERO CTA SECTION ========== -->
+  <section class="hero-cta" id="hero-cta">
+    <div class="section-inner">
+      <div class="reveal-wrapper">
+        <h1>Win the Ultimate Festival VIP Experience.</h1>
+      </div>
+      <p class="subheadline">Enter for your chance to win the full Wireless Festival VIP experience. It takes 10 seconds.</p>
+      <button class="cta-btn" type="button" aria-label="Enter Now">Enter Now</button>
+      <p class="micro-text">Free to enter. No purchase necessary.</p>
     </div>
   </section>
 
@@ -1222,22 +1228,10 @@
 
   <!-- ========== THE FEELING SECTION ========== -->
   <section class="feeling" id="feeling">
-    <div class="bokeh-layer" aria-hidden="true">
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-      <div class="bokeh-circle"></div>
-    </div>
-
-    <div class="light-streak" aria-hidden="true"></div>
-    <div class="light-streak" aria-hidden="true"></div>
-    <div class="light-streak" aria-hidden="true"></div>
+    <video class="feeling-video" autoplay muted loop playsinline aria-hidden="true">
+      <source src="./assets/mixkit-crowd-jumping-at-the-concert-14084-hd-ready.mp4" type="video/mp4">
+    </video>
+    <div class="feeling-video-overlay" aria-hidden="true"></div>
 
     <div class="section-inner">
       <div class="reveal-wrapper">
@@ -1574,102 +1568,47 @@
     return element.querySelectorAll('.char');
   }
 
-  const heroH1 = document.querySelector('.hero h1');
-  const chars = splitTextToChars(heroH1);
+  const heroCtaH1 = document.querySelector('.hero-cta h1');
+  const chars = heroCtaH1 ? splitTextToChars(heroCtaH1) : [];
 
   // === HERO ENTRANCE ANIMATION ===
   // Overwrites the placeholder from Task 5.
   triggerHeroEntrance = function() {
     if (prefersReducedMotion) {
-      gsap.set(chars, { opacity: 1, y: 0, rotateX: 0 });
-      gsap.set('.hero .subheadline', { opacity: 1, y: 0 });
-      gsap.set('.hero .cta-btn', { opacity: 1, y: 0 });
-      gsap.set('.hero .micro-text', { opacity: 1 });
+      gsap.set('.hero-script', { opacity: 1, y: 0 });
+      gsap.set('.hero-enter-btn', { opacity: 1, y: 0 });
       gsap.set('.scroll-prompt', { opacity: 0.4 });
       return;
     }
 
     const tl = gsap.timeline();
-    // Characters animate in
-    tl.from(chars, {
-      opacity: 0, y: 60, rotateX: -90,
-      duration: 1.2, stagger: 0.03, ease: 'power4.out'
+    // Script title fades in
+    tl.from('.hero-script', {
+      opacity: 0, scale: 0.8, duration: 1, ease: 'power3.out'
     });
-    // Subheadline fades up
-    tl.from('.hero .subheadline', {
+    // Enter button fades up
+    tl.from('.hero-enter-btn', {
       opacity: 0, y: 30, duration: 0.8, ease: 'power3.out'
-    }, '-=0.6');
-    // CTA fades up
-    tl.from('.hero .cta-btn', {
-      opacity: 0, y: 20, duration: 0.6, ease: 'power3.out'
-    }, '-=0.4');
-    // Micro text
-    tl.from('.hero .micro-text', {
-      opacity: 0, duration: 0.4
-    }, '-=0.2');
+    }, '-=0.5');
     // Scroll prompt appears
     tl.from('.scroll-prompt', {
       opacity: 0, duration: 0.6
     }, '-=0.2');
-    // Shimmer sweep after text settles
-    tl.add(() => {
-      heroH1.classList.add('shimmer-active');
-      // Repeat shimmer every 8 seconds
-      setInterval(() => {
-        heroH1.classList.remove('shimmer-active');
-        void heroH1.offsetWidth; // force reflow to restart animation
-        heroH1.classList.add('shimmer-active');
-      }, 8000);
-    }, '+=0.3');
   };
 
-  // === MOUSE-FOLLOW CAN ===
-  // Mouse-follow applies to .can-image (the img) to avoid conflicting
-  // with GSAP ScrollTrigger transforms on .can-wrapper (the outer div).
+  // === HERO GRID ENTRANCE ===
   const heroSection = document.querySelector('.hero');
-  const canImage = document.querySelector('.can-image');
-  let canTargetRotateX = 0, canTargetRotateY = 0;
-  let canCurrentRotateX = 0, canCurrentRotateY = 0;
+  const gridItems = document.querySelectorAll('.hero-grid-item');
 
-  if (isDesktop && !prefersReducedMotion) {
-    heroSection.addEventListener('mousemove', (e) => {
-      const rect = heroSection.getBoundingClientRect();
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const mouseXRel = e.clientX - rect.left - centerX;
-      const mouseYRel = e.clientY - rect.top - centerY;
-      canTargetRotateY = (mouseXRel / centerX) * 8;  // max 8deg
-      canTargetRotateX = -(mouseYRel / centerY) * 8;
-    });
-
-    heroSection.addEventListener('mouseleave', () => {
-      canTargetRotateX = 0;
-      canTargetRotateY = 0;
-    });
-
-    gsap.ticker.add(() => {
-      canCurrentRotateX += (canTargetRotateX - canCurrentRotateX) * 0.08;
-      canCurrentRotateY += (canTargetRotateY - canCurrentRotateY) * 0.08;
-      // Only mouse-follow tilt on .can-image; scroll transforms are on .can-wrapper
-      canImage.style.transform = `perspective(1000px) rotateX(${canCurrentRotateX}deg) rotateY(${canCurrentRotateY}deg)`;
-    });
-  }
-
-  // === SCROLL-DRIVEN CAN ===
-  // GSAP animates .can-wrapper (outer div) so transforms don't conflict
-  // with the mouse-follow tilt on .can-image (inner img).
+  // Stagger grid items on entrance
   if (!prefersReducedMotion) {
-    gsap.to('.can-wrapper', {
-      y: -150,
-      scale: 1.1,
-      rotate: -5,
-      '--glow-intensity': 160, // intensifies drop-shadow on scroll
-      scrollTrigger: {
-        trigger: '.hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1
-      }
+    gsap.from(gridItems, {
+      opacity: 0,
+      scale: 0.8,
+      duration: 0.8,
+      stagger: { amount: 0.6, from: 'random' },
+      ease: 'power3.out',
+      delay: 0.2
     });
 
     // Scroll prompt fades out
@@ -1680,6 +1619,18 @@
         start: '50px top',
         end: '150px top',
         scrub: true
+      }
+    });
+
+    // Grid parallax on scroll
+    gsap.to('.hero-grid', {
+      scale: 1.08,
+      opacity: 0.3,
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
       }
     });
   }
@@ -1751,10 +1702,9 @@
 
     // Create 70 bubble particles
     function resetBubble(b) {
-      const canRect = canImage.getBoundingClientRect();
       const heroRect = heroSection.getBoundingClientRect();
-      b.x = canRect.left - heroRect.left + canRect.width * (0.3 + Math.random() * 0.4);
-      b.y = canRect.top - heroRect.top;
+      b.x = heroRect.width * (0.3 + Math.random() * 0.4);
+      b.y = heroRect.height * (0.4 + Math.random() * 0.2);
       b.radius = Math.random() * 2 + 1;
       b.opacity = Math.random() * 0.5 + 0.3;
       b.speed = Math.random() * 1.5 + 0.5;
@@ -2195,7 +2145,7 @@
   });
 
   // === ANALYTICS — CTA CLICKS ===
-  document.querySelectorAll('.hero .cta-btn').forEach(btn =>
+  document.querySelectorAll('.hero-cta .cta-btn').forEach(btn =>
     btn.addEventListener('click', () => trackEvent('cta_hero_clicked'))
   );
   document.querySelectorAll('.prize-reveal .cta-btn').forEach(btn =>
