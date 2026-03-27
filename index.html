@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One in a Million | Coca-Cola</title>
+  <meta name="description" content="Enter the Coca-Cola One in a Million competition for your chance to win the ultimate Wireless Festival VIP experience. Free to enter. Takes 10 seconds.">
+  <meta property="og:title" content="One in a Million | Coca-Cola">
+  <meta property="og:description" content="Win 2× VIP passes, backstage access, a 5-star hotel, £500 spending money and private transfers to Wireless Festival 2025. Free to enter.">
+  <meta property="og:type" content="website">
 
   <!-- GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID_PLACEHOLDER"></script>
@@ -463,13 +467,13 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: var(--color-text-tertiary);
+    color: rgba(255,255,255,0.7);
   }
 
   .scroll-prompt svg {
     width: 24px;
     height: 24px;
-    stroke: var(--color-text-tertiary);
+    stroke: rgba(255,255,255,0.7);
     fill: none;
     stroke-width: 2;
     animation: scroll-prompt-breathing 2s ease-in-out infinite;
@@ -568,6 +572,20 @@
     line-height: 0;
     vertical-align: -0.5rem;
     margin-right: 0.2rem;
+  }
+  .winner-quote-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    letter-spacing: 0.05em;
   }
   .winner-quote-attr {
     font-size: 0.85rem;
@@ -736,6 +754,14 @@
   .form-container {
     max-width: 560px;
     margin: 0 auto;
+  }
+
+  .prize-reminder {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
   }
 
   /* Animated gradient border wrapper */
@@ -1034,11 +1060,11 @@
   @keyframes scroll-prompt-breathing {
     0%, 100% {
       transform: translateY(0);
-      opacity: 0.3;
+      opacity: 0.6;
     }
     50% {
       transform: translateY(8px);
-      opacity: 0.6;
+      opacity: 1;
     }
   }
 
@@ -1108,7 +1134,7 @@
   <!-- ========== STICKY CTA BAR ========== -->
   <div id="sticky-cta" class="sticky-cta" style="display:none">
     <!-- TODO: Replace "Wireless Festival" with actual festival name before launch -->
-    <span class="sticky-cta-label">Win the Wireless Festival VIP experience</span>
+    <span class="sticky-cta-label">Win the Ultimate Festival VIP Experience</span>
     <button class="sticky-cta-btn cta-btn">Enter Now</button>
   </div>
 
@@ -1145,22 +1171,22 @@
       <div class="hero-grid-item"><img src="./assets/istockphoto-487787108-612x612.jpg" alt="" loading="eager"></div>
       <div class="hero-grid-item"><img src="./assets/66374286_10156446947075817_8748786684746792960_n-1.jpg" alt="" loading="eager"></div>
       <div class="hero-grid-item"><img src="./assets/images.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/89E28398-CF0A-51BC-1E859AA78E3AF693.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/wp14748701.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/ai-generated-cheering-people-in-music-festival-live-rock-concert-festival-night-club-crowd-cheering-stage-lights-and-confetti-falling-cheering-crowd-in-li.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/Drinks-cola.webp" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/close-up-photo-pouring-cola-drink-glass-ice-cubes-magnified-view-captures-refreshing-process-serving-cola-418292359.webp" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/images (2).jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/close-up-coca-cola-can-lot-water-drops-226521323.webp" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/1000_F_142515887_xVLCVpdyWDU5ScHTi64iMCEZJioVHqU4.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/66374286_10156446947075817_8748786684746792960_n-1.jpg" alt="" loading="eager"></div>
-      <div class="hero-grid-item"><img src="./assets/89E28398-CF0A-51BC-1E859AA78E3AF693.jpg" alt="" loading="eager"></div>
+      <div class="hero-grid-item"><img src="./assets/89E28398-CF0A-51BC-1E859AA78E3AF693.jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/wp14748701.jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/ai-generated-cheering-people-in-music-festival-live-rock-concert-festival-night-club-crowd-cheering-stage-lights-and-confetti-falling-cheering-crowd-in-li.jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/Drinks-cola.webp" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-photo-pouring-cola-drink-glass-ice-cubes-magnified-view-captures-refreshing-process-serving-cola-418292359.webp" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/images (2).jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/close-up-coca-cola-can-lot-water-drops-226521323.webp" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/1000_F_142515887_xVLCVpdyWDU5ScHTi64iMCEZJioVHqU4.jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/66374286_10156446947075817_8748786684746792960_n-1.jpg" alt="" loading="lazy"></div>
+      <div class="hero-grid-item"><img src="./assets/89E28398-CF0A-51BC-1E859AA78E3AF693.jpg" alt="" loading="lazy"></div>
     </div>
 
     <!-- Overlay content -->
     <div class="hero-overlay">
-      <h1 class="hero-script">One in a Million</h1>
-      <button class="cta-btn hero-enter-btn" type="button" aria-label="Enter Here">Enter Here</button>
+      <h1 class="hero-script">Your VIP Festival Summer Starts Here.</h1>
+      <button class="cta-btn hero-enter-btn" type="button" aria-label="Enter Now">Enter Now</button>
       <div class="scroll-prompt" aria-hidden="true">
         <span>Scroll</span>
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1215,6 +1241,7 @@
       </div>
 
       <div class="winner-quote">
+        <div class="winner-quote-avatar" aria-hidden="true">JR</div>
         <p class="winner-quote-text">"I genuinely couldn't believe it — the backstage access was something else. Best night of my life."</p>
         <p class="winner-quote-attr">— Jamie R., Manchester &nbsp;·&nbsp; 2024 Winner</p>
       </div>
@@ -1259,13 +1286,13 @@
           <div class="step-number">2</div>
           <h3>We pick one winner at random.</h3>
           <!-- TODO: Update draw date each month -->
-          <p>We pick one winner at random. Next draw: <strong class="draw-date">31 July 2025</strong>. Every entry counts.</p>
+          <p>Draw held monthly. Next draw: <strong class="draw-date">31 July 2025</strong>. Every entry counts.</p>
         </div>
         <div class="step-card">
           <div class="step-number">3</div>
           <h3>We call you. You win everything.</h3>
           <!-- TODO: Replace "Wireless Festival" with actual festival name before launch -->
-          <p>We call you. You win everything — tickets, backstage access, hotel, transfers. Your Wireless Festival experience, fully sorted.</p>
+          <p>Tickets, backstage access, 5-star hotel, and transfers — your Wireless Festival experience, fully sorted.</p>
         </div>
       </div>
     </div>
@@ -1281,6 +1308,7 @@
       <p class="form-subheadline">One winner. One Wireless Festival weekend. Fully VIP.</p>
 
       <div class="form-container">
+        <p class="prize-reminder">🎟 2× VIP passes · Backstage access · 5-star hotel · £500 spending money · Private transfers</p>
         <form id="entry-form" novalidate>
           <label for="email" class="form-label">Email address</label>
           <p class="urgency-line">
@@ -1750,14 +1778,12 @@
   // === UNIFIED RENDER LOOP ===
   function animationLoop() {
     if (!document.hidden && !prefersReducedMotion) {
-      drawAmbientParticles();
-      drawBubbles();
+      if (typeof drawAmbientParticles === 'function') drawAmbientParticles();
+      if (typeof drawBubbles === 'function') drawBubbles();
     }
     requestAnimationFrame(animationLoop);
   }
-  if (!prefersReducedMotion) {
-    requestAnimationFrame(animationLoop);
-  }
+  requestAnimationFrame(animationLoop);
 
   // === MAGNETIC BUTTONS ===
   // Only .cta-btn and .submit-btn get the magnetic effect.
